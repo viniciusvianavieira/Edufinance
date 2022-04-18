@@ -127,7 +127,7 @@ try:
 
     print(all_stories_informations)
 
-    # all_stories_informations.to_sql('informacoes_stories_instagram', aws.engine, index=False, if_exists='append', chunksize=10000, method='multi')
+    all_stories_informations.to_sql('informacoes_stories_instagram', aws.engine, index=False, if_exists='append', chunksize=10000, method='multi')
 except:
     print("Nenhum storie encontrado")
 
