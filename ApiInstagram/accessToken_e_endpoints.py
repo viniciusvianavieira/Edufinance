@@ -11,20 +11,19 @@ import os
 os.system('cls' if os.name == 'nt' else 'clear')
 print()
 
-
 class Parametros:
     
     def __init__(self):
 
         self.params = dict()
-        self.params['access_token'] = os.getenv('access_token_instagram')#Primeiro coloca o access_token do facebook developers, e o programa te redirecionará um mais longo
-        self.params['client_id'] = os.getenv('client_id_instagram')#facebook_developers --> settings               
-        self.params['client_secret'] = os.getenv('client_secret_instagram') #facebook_developers --> settings
+        self.params['access_token'] = os.getenv('access_token')#Primeiro coloca o access_token do facebook developers, e o programa te redirecionará um mais longo
+        self.params['client_id'] = os.getenv('client_id')#facebook_developers --> settings               
+        self.params['client_secret'] = os.getenv('client_secret')#facebook_developers --> settings
         self.params['graph_domain'] = 'https://graph.facebook.com'
         self.params['graph_version'] = 'v12.0'
         self.params['endpoint_base'] = self.params['graph_domain'] + '/' + self.params['graph_version'] + '/'
-        self.params['page_id'] = os.getenv('page_id_instagram')    #Id da página do fb vinculada ao instagram
-        self.params['instagram_account_id'] = os.getenv('account_id_instagram')  #Id do instagram que o Facebook Developers dá ao conectar
+        self.params['page_id'] = os.getenv('page_id') #Id da página do fb vinculada ao instagram
+        self.params['instagram_account_id'] = os.getenv('instagram_account_id') #Id do instagram que o Facebook Developers dá ao conectar
         self.params['ig_username'] = 'edufinance' #Usuario
 
     
@@ -59,15 +58,16 @@ class Parametros:
         self.endpointparams['client_secret'] = self.params['client_secret']
         self.endpointparams['fb_exchange_token'] = self.params['access_token']
 
-        
+
         # Requests Data
         data = requests.get(url, self.endpointparams )
         long_lived_token = json.loads(data.content)
-        #print(long_lived_token['access_token'])
+        print(long_lived_token['access_token'])
         print()
 
 
-#2022-06-11 13:24:27
+
+#2022-06-17 15:30:36
 
 if __name__ == "__main__":
 
