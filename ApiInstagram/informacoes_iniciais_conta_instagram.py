@@ -57,4 +57,4 @@ aws = conexao_aws(senha = senha_sql, usuario=usuario_sql, nome_do_banco='redes_s
 aws.iniciar_conexao()
 
 
-# df_metrics_accounts_generics.to_sql('informacoes_iniciais_conta_instagram', aws.engine, index=False, if_exists='append', chunksize=10000, method='multi')
+df_metrics_accounts_generics.to_sql('informacoes_iniciais_conta_instagram', aws.engine, index=False, if_exists='append', chunksize=10000, method='multi')
