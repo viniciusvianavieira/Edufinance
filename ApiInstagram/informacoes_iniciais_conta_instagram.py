@@ -1,12 +1,16 @@
 #https://developers.facebook.com/docs/instagram-api/reference/ig-user/insights
 
 # Import Libraries
+from traceback import print_tb
 import requests
 import json
 import datetime
+from datetime import date
 import pandas as pd
 import datetime
 import os
+import boto3
+from sqlalchemy import DATE
 from conexao_banco import conexao_aws
 from dateutil.relativedelta import relativedelta
 from accessToken_e_endpoints import Parametros
@@ -48,13 +52,77 @@ df_metrics_accounts_generics = pd.DataFrame(list(zip(date_time,generic_followers
 
 df_metrics_accounts_generics = df_metrics_accounts_generics[['Data_de_extracao','Seguidores','Seguindo','Midias']]
 
-df_metrics_accounts_generics
+json = { str(data):{
+ "Data_de_extracao" : str(data),
+ "Seguidores": df_metrics_accounts_generics['Seguidores'][0],
+ "Seguindo:": df_metrics_accounts_generics['Seguindo'][0],
+ "Midias": df_metrics_accounts_generics['Midias'][0]
+}}
 
-usuario_sql = os.getenv('usuario_sql')
-senha_sql = os.getenv('senha_sql')
-    
-aws = conexao_aws(senha = senha_sql, usuario=usuario_sql, nome_do_banco='redes_sociais')
-aws.iniciar_conexao()
+print(json)
+
+import boto3
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('informacoes_iniciais_conta_instagram')
+print()
+print("Data da criação: ",table.creation_date_time)
+print()
+
+table.put_item(
+   Item={
+        "Data_de_extracao" : str(data),
+        "Seguidores": int(df_metrics_accounts_generics['Seguidores'][0]),
+        "Seguindo:": int(df_metrics_accounts_generics['Seguindo'][0]),
+        "Midias": int(df_metrics_accounts_generics['Midias'][0]),
+    }
+)
 
 
-df_metrics_accounts_generics.to_sql('informacoes_iniciais_conta_instagram', aws.engine, index=False, if_exists='append', chunksize=10000, method='multi')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# #CREATING TABLE
+# dynamodb = boto3.resource('dynamodb')
+
+# # Create the DynamoDB table.
+# table = dynamodb.create_table(
+#     TableName='informacoes_iniciais_conta_instagram',
+#     KeySchema=[
+#         {
+#             'AttributeName': 'Data_de_extracao',
+#             'KeyType': 'HASH'
+#         }
+#     ],
+#     AttributeDefinitions=[
+#         {
+#             'AttributeName': 'Data_de_extracao',
+#             'AttributeType': 'S'
+#         }
+#     ],
+#     ProvisionedThroughput={
+#         'ReadCapacityUnits': 5,
+#         'WriteCapacityUnits': 5
+#     }
+# )
+
+# # Wait until the table exists.
+# table.wait_until_exists()
+
+# # Print out some data about the table.
+# print(table.item_count)

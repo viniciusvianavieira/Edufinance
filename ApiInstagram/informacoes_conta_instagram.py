@@ -1,6 +1,9 @@
 #https://developers.facebook.com/docs/instagram-api/reference/ig-user/insights
 
 # Import Libraries
+from time import process_time_ns
+from traceback import print_tb
+from matplotlib.pyplot import table
 import requests
 import json
 import datetime
@@ -12,6 +15,7 @@ from dateutil.relativedelta import relativedelta
 from accessToken_e_endpoints import Parametros
 import pytz
 utc=pytz.UTC
+import boto3
 
 os.system('cls' if os.name == 'nt' else 'clear')
 print()
@@ -79,8 +83,8 @@ while Existe_pagina_anterior:
         Existe_pagina = False
         break
     
-    if cont == 1: #fazendo um contador, pois só precisamos do ultimo dia atualizado(já pegamos a base de dados)
-        break
+    # if cont == 1: #fazendo um contador, pois só precisamos do ultimo dia atualizado(já pegamos a base de dados)
+    #     break
     
 # Create DataFrame
 # date_time = pd.DataFrame(date_time)
@@ -91,6 +95,7 @@ df_account_metrics['UTC_do_dia'] = pd.to_datetime(df_account_metrics['UTC_do_dia
 
 df_account_metrics = df_account_metrics.pivot(index="UTC_do_dia",columns="Nome",values="Valor")
 
+date = datetime.datetime.now
 df_account_metrics['Data_de_extracao'] = [datetime.datetime.now()] * len(df_account_metrics)
 
 
@@ -102,20 +107,51 @@ df_account_metrics = df_account_metrics.rename(columns={'Número de seguidores':
 df_account_metrics = df_account_metrics.rename(columns={'Cliques no site': 'Cliques_no_site'})
 
 
-df_account_metrics.dropna(inplace=True) #excluindo colunas com valores vazios
+# df_account_metrics.dropna(inplace=True) #excluindo linhas com valores vazios
 
-df_account_metrics = df_account_metrics.tail(1)
+# df_account_metrics = df_account_metrics.tail(1)
+
+df_account_metrics = df_account_metrics.reset_index()
 
 print(df_account_metrics)
+print()
 
-usuario_sql = os.getenv('usuario_sql')
-senha_sql = os.getenv('senha_sql')
+utc = df_account_metrics['UTC_do_dia'].to_string() 
+utc = utc[4:] #para retirar os vazios
+utcNow = df_account_metrics['Data_de_extracao'].to_string()
+utcNow = utcNow[4:] #para retirar os vazios
 
-aws = conexao_aws(senha = senha_sql, usuario=usuario_sql, nome_do_banco='redes_sociais')
-aws.iniciar_conexao()
+# json = {
 
+#     'Data_de_extracao': str(utcNow),
+#     'Utc_do_dia': str(utc),
+#     'Alcance': int(df_account_metrics['Alcance']),
+#     'Impressoes': int(df_account_metrics['Impressoes']),
+#     'Visualizacoes_do_perfil': int(df_account_metrics['Visualizacoes_do_perfil']),
+#     'Numero_de_seguidores': int(df_account_metrics['Numero_de_seguidores']),
+#     'Cliques_no_site': int(df_account_metrics['Cliques_no_site'])
+# }
+#print(json)
 
-df_account_metrics.to_sql('informacoes_conta_instagram', aws.engine, index=True, if_exists='append', chunksize=10000, method='multi')
+# Get the service resource.
+dynamodb = boto3.resource('dynamodb')
 
+table = dynamodb.Table('informacoes_conta_instagram')
 
+print(table.creation_date_time)
+
+with table.batch_writer() as batch:
+    for i,datas in enumerate(df_account_metrics['Data_de_extracao'].to_list()):
+        batch.put_item(
+            Item={
+                'Data_de_extracao':  str(utcNow),
+                'Dados': {
+                            'Alcance': df_account_metrics['Alcance'][i],
+                            'Impressoes': df_account_metrics['Impressoes'][i],
+                            'Numero_de_seguidores': df_account_metrics['Numero_de_seguidores'],
+                            'Cliques_no_site': df_account_metrics['Cliques_no_site']
+
+                },
+            }
+        )
 
