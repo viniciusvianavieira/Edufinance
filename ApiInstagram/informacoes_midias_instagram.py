@@ -51,8 +51,7 @@ class Informacoes_midia:
         for i in range(0,len(basic_insight['data'])):
             fotos_ids.append(basic_insight['data'][i]['id']) #pegando os id's das primeiras paginas
             
-
-        Existe_proxima_pagina = 0
+        Existe_proxima_pagina = 1
         while Existe_proxima_pagina < 1:
             
             try:
@@ -78,7 +77,9 @@ class Informacoes_midia:
 
         # Loop Over 'Media ID'
         cont = 0
+
         for id in all_basics_insights['Id'].to_list():
+            print('cont',id)
 
             cont = cont + 1
             parametros.params['latest_media_id'] = str(id)
@@ -100,7 +101,8 @@ class Informacoes_midia:
             except:
                 pass
 
-       
+        
+
         self.data_hoje = datetime.datetime.now()
 
         # Initialize Empty Container
