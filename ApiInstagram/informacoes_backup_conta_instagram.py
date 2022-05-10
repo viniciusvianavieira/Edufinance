@@ -7,8 +7,6 @@ import datetime
 import pandas as pd
 import datetime
 import os
-from sqlalchemy import false, true
-from conexao_banco import conexao_aws
 from dateutil.relativedelta import relativedelta
 from accessToken_e_endpoints import Parametros
 import pytz

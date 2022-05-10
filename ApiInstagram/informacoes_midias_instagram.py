@@ -11,8 +11,6 @@ import datetime
 import os
 import boto3
 from boto3.dynamodb.conditions import Key, Attr
-from sqlalchemy import true
-from conexao_banco import conexao_aws
 from dateutil.relativedelta import relativedelta
 from accessToken_e_endpoints import Parametros
 from botocore.exceptions import ClientError
@@ -32,7 +30,6 @@ class Informacoes_midia:
 
         # Define URL
         url = parametros.params['endpoint_base'] + parametros.params['instagram_account_id'] + '/media'
-
         # Define Endpoint Parameters
         endpointParams = dict()
         endpointParams['fields'] = 'id,caption,media_product_type,media_type,permalink,timestamp,username,like_count,comments_count'
@@ -79,7 +76,6 @@ class Informacoes_midia:
         cont = 0
 
         for id in all_basics_insights['Id'].to_list():
-            print('cont',id)
 
             cont = cont + 1
             parametros.params['latest_media_id'] = str(id)
