@@ -1,0 +1,8 @@
+boto3==1.22.11
+botocore==1.25.11
+numpy==1.22.3
+pandas==1.4.2
+python_dateutil==2.8.2
+pytz==2022.1
+requests==2.27.1
+typing_extensions==4.2.0

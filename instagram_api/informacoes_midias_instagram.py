@@ -28,8 +28,11 @@ class Informacoes_midia:
 
         parametros = Parametros()
 
+        print(parametros.params['endpoint_base'])
+        print(parametros.params['instagram_account_id'])
         # Define URL
         url = parametros.params['endpoint_base'] + parametros.params['instagram_account_id'] + '/media'
+        print(url)
         # Define Endpoint Parameters
         endpointParams = dict()
         endpointParams['fields'] = 'id,caption,media_product_type,media_type,permalink,timestamp,username,like_count,comments_count'
@@ -164,8 +167,8 @@ class UtilizandoDynamo:
         tempo_agora = (datetime.datetime.utcnow()).astimezone(tz=None)  #tranformando na mesma formatação do pandas
 
         for i, id_foto in enumerate(iniciar.all_insights['Id']): #COMPARAR OS IDS COM OS IDS DA BASE
-            if tempo_agora < (iniciar.all_insights['UTC_da_postagem'][i] + relativedelta(hours=24)): #o tempo de agora for maior que o tempo da publicação + 15 minutos então
-                print("Postou a foto de Id ",id_foto," menos de 24 horas, foi adicionado")
+            if tempo_agora < (iniciar.all_insights['UTC_da_postagem'][i] + relativedelta(hours=168)): #o tempo de agora for maior que o tempo da publicação + 15 minutos então
+                print("Postou a foto de Id ",id_foto," menos de 7 dias, foi adicionada")
                 teste.comando_adicionar_midias_ao_dynamo(i,iniciar)
 
 

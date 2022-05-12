@@ -1,6 +1,8 @@
 #https://developers.facebook.com/docs/instagram-api/reference/ig-user/insights
 
 # Import Libraries
+from operator import index
+from re import A
 import requests
 import json
 import datetime
@@ -18,7 +20,7 @@ print()
 
 class informacoes_backup_conta_instagram:
 
-        def pegando_informacoes_backup():
+        def pegando_informacoes_backup(self):
 
             parametros = Parametros()
 
@@ -58,8 +60,8 @@ class informacoes_backup_conta_instagram:
 
 
             cont = 0
-            Existe_pagina_anterior = 1
-            while Existe_pagina_anterior < 16:
+            Existe_pagina_anterior = 0
+            while Existe_pagina_anterior < 1:
                 cont = cont + 1
                 try:
                     if cont > 14: #CADA PAGINA TEM 2 DIAS E SÓ PODE 30 DE FOLLOWER_COUNT
@@ -93,56 +95,31 @@ class informacoes_backup_conta_instagram:
                     break
 
 
-            df_account_metrics = pd.DataFrame(list(zip(metrics_time,metrics_name,metrics_value)),columns =['UTC_do_dia','Nome' , 'Valor'])
+            self.df_account_metrics = pd.DataFrame(list(zip(metrics_time,metrics_name,metrics_value)),columns =['UTC_do_dia','Nome' , 'Valor'])
 
-            df_account_metrics = df_account_metrics.pivot(index="UTC_do_dia",columns="Nome",values="Valor")
+            self.df_account_metrics = self.df_account_metrics.pivot(index="UTC_do_dia",columns="Nome",values="Valor")
 
             date = datetime.date.today()
-            df_account_metrics['Data_de_extracao'] = [datetime.date.today()] * len(df_account_metrics)
+            self.df_account_metrics['Data_de_extracao'] = [datetime.date.today()] * len(self.df_account_metrics)
 
 
-            df_account_metrics = df_account_metrics[['Data_de_extracao','Alcance','Impressões','Visualizações do perfil', 'Número de seguidores', 'Cliques no site']]
+            self.df_account_metrics = self.df_account_metrics[['Data_de_extracao','Alcance','Impressões','Visualizações do perfil', 'Número de seguidores', 'Cliques no site']]
 
-            df_account_metrics = df_account_metrics.rename(columns={'Impressões': 'Impressoes'})
-            df_account_metrics = df_account_metrics.rename(columns={'Visualizações do perfil': 'Visualizacoes_do_perfil'})
-            df_account_metrics = df_account_metrics.rename(columns={'Número de seguidores': 'Numero_de_seguidores'})
-            df_account_metrics = df_account_metrics.rename(columns={'Cliques no site': 'Cliques_no_site'})
-
-
-            # df_account_metrics.dropna(inplace=True) #excluindo linhas com valores vazios
-            df_account_metrics = df_account_metrics.reset_index()
-
-            df_account_metrics = df_account_metrics.fillna('------')
+            self.df_account_metrics = self.df_account_metrics.rename(columns={'Impressões': 'Impressoes'})
+            self.df_account_metrics = self.df_account_metrics.rename(columns={'Visualizações do perfil': 'Visualizacoes_do_perfil'})
+            self.df_account_metrics = self.df_account_metrics.rename(columns={'Número de seguidores': 'Numero_de_seguidores'})
+            self.df_account_metrics = self.df_account_metrics.rename(columns={'Cliques no site': 'Cliques_no_site'})
 
 
-            print(df_account_metrics)
+            # self.df_account_metrics.dropna(inplace=True) #excluindo linhas com valores vazios
+            self.df_account_metrics = self.df_account_metrics.reset_index()
 
-            # Get the service resource.
-
-            dynamodb = boto3.resource('dynamodb')
-            table = dynamodb.Table('informacoes_conta_instagram')
-
-            for i,data in enumerate(df_account_metrics['UTC_do_dia']):
-                try:
-                    table.update_item(
-                        Key={
-                            'Data_do_dia': str(df_account_metrics['UTC_do_dia'][i]),
-                        },
-                        UpdateExpression='SET Insights = :valor',
-                        ExpressionAttributeValues={
-                            ':valor': {
-                                    'Alcance': int(df_account_metrics['Alcance'][i]),
-                                    'Impressoes': int(df_account_metrics['Impressoes'][i]),
-                                    'Numero_de_seguidores': int(df_account_metrics['Numero_de_seguidores'][i]),
-                                    'Visualizacoes_do_perfil': int(df_account_metrics['Visualizacoes_do_perfil'][i]),
-                                    'Cliques_no_site': int(df_account_metrics['Cliques_no_site'][i]),
-                                    }
-                                                }
-                                    )
-                except:
-                    pass
+            self.df_account_metrics = self.df_account_metrics.fillna('------')
+            
+            print(self.df_account_metrics)
 
 
 
 
-informacoes_backup_conta_instagram.pegando_informacoes_backup()
+
+

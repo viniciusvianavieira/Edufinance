@@ -5,7 +5,7 @@ import string
 import boto3
 from botocore.exceptions import ClientError
 
-class MidiasComandosDynamo:
+class ComandosDynamo:
 
         def comando_adicionar_midias_ao_dynamo(self,i,iniciar):
 
@@ -84,6 +84,65 @@ class MidiasComandosDynamo:
                         print(e.response['Error']['Message'])
                 else:
                         return response['Item']
-                        
+
+        def comando_upload_backup_ao_dynamo(self,i,backup):
+
+                dynamodb = boto3.resource('dynamodb')
+                table = dynamodb.Table('informacoes_conta_instagram')
+
+                table.update_item(
+                        Key={
+                        'Data_do_dia': str(backup.df_account_metrics['UTC_do_dia'][i]),
+                         },
+                        UpdateExpression='SET Dados = :valor',
+                        ExpressionAttributeValues={
+                        ':valor': {
+                                "Data_do_dia": str(backup.df_account_metrics['UTC_do_dia'][i]),
+                                "Dados":{
+                                        "Alcance": str(backup.df_account_metrics['Alcance'][i]),
+                                        "Impressoes": str(backup.df_account_metrics['Impressoes'][i]),
+                                        "Numero_de_seguidores": str(backup.df_account_metrics['Numero_de_seguidores'][i]),
+                                        "Visualizacoes_do_perfil": str(backup.df_account_metrics['Visualizacoes_do_perfil'][i]),
+                                        "Cliques_no_site": str(backup.df_account_metrics['Cliques_no_site'][i]),
+                                                }
+                                        }
+                        }
+                )
+                
+
+        def comando_upload_iniciais_ao_dynamo(self,iniciais):
+
+                dynamodb = boto3.resource('dynamodb')
+                table = dynamodb.Table('informacoes_conta_instagram')
+
+                table.update_item(
+                        Key={
+                        'Data_do_dia': str(iniciais.data_do_dia),
+                         },
+                        UpdateExpression='SET Metricas = :valor',
+                        ExpressionAttributeValues={
+                        ':valor': {
+                                "Seguidores": int(iniciais.df_metrics_accounts_generics['Seguidores'][0]),
+                                "Seguindo:": int(iniciais.df_metrics_accounts_generics['Seguindo'][0]),
+                                "Midias": int(iniciais.df_metrics_accounts_generics['Midias'][0]),
+
+                                }
+                        }
+                
+                )
+
+
+        
+
+                                
+
+
+
+
+
+
+
+
+
 
 

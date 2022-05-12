@@ -40,7 +40,7 @@ class Parametros:
         # Requests Data
         data = requests.get(url, self.endpointparams)
         access_token_data = json.loads(data.content)
-        
+        print(data)
         #access_token_data
         print("Token Expires: ", datetime.datetime.fromtimestamp(access_token_data['data']['expires_at']))
         print()
