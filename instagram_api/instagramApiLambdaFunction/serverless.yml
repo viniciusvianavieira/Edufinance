@@ -1,0 +1,79 @@
+
+service: instagramApiLambdaFunction
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.8
+
+  # Extending Lambda layer
+  layers:
+      - arn:aws:lambda:us-east-1:142739615414:layer:python-packages-instagramapi:1
+  # Variaveis de ambiente
+  environment:
+      access_token: 'EAAbdojcuBagBAHH8ZAZBRNsFwqZCXxH6ANJTd6rUJFROBcviZAhu53sWlBY0eap78TIkq4QslfzytpNfpKSljZBBvxx8bGRURVZAKafgKsvxQD3Cwbj7jNncLixIY5QZB8vascURqtM3n8BIotyw0Rt3uWEObnvMiAfuBJHJ0jZCRUf2gBsMfjuuRtFEiQElhhwZD'
+      client_id: '1932538640467368'
+      client_secret: 'fd431f0e9efb648bc6ac27fffcf4cae0'
+      page_id: '527015930816521'
+      instagram_account_id: '17841406234741156'
+  iam:
+    role: 
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:*
+            - s3:*
+          Resource: '*'
+
+# Lambda Function definition
+functions:
+
+  #função1
+  handlerconta:
+    handler: handlerconta.informacoesconta
+    events:
+      - schedule: rate(25 minutes) #roda a funcao todo dia ás 12h
+    
+  #funcao2
+  handlerstorie:
+    handler: handlerstorie.informacoesstorie
+    events:
+      - schedule: rate(25 minutes) #roda todo dia a cada 2
+
+  #funcao3
+  handlermidia:
+    handler: handlermidia.informacoesmidia
+    events:
+      - schedule: rate(25 minutes) #roda a cada 2 minutos
+
+
+
+resources:
+  Resources:
+    uploadBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: instagram-api-bucket
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

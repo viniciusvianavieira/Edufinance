@@ -1,7 +1,6 @@
 #https://developers.facebook.com/docs/instagram-api/reference/ig-user/insights
 
 # Import Libraries
-from traceback import print_tb
 import requests
 import json
 import datetime
@@ -9,7 +8,6 @@ from datetime import date
 import pandas as pd
 import datetime
 import os
-import boto3
 from dateutil.relativedelta import relativedelta
 from accessToken_e_endpoints import Parametros
 import pytz

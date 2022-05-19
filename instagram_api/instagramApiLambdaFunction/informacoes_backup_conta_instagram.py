@@ -1,19 +1,15 @@
 #https://developers.facebook.com/docs/instagram-api/reference/ig-user/insights
 
 # Import Libraries
-from operator import index
-from re import A
 import requests
 import json
 import datetime
 import pandas as pd
 import datetime
 import os
-from dateutil.relativedelta import relativedelta
 from accessToken_e_endpoints import Parametros
 import pytz
 utc=pytz.UTC
-import boto3
 
 os.system('cls' if os.name == 'nt' else 'clear')
 print()
@@ -61,7 +57,7 @@ class informacoes_backup_conta_instagram:
 
             cont = 0
             Existe_pagina_anterior = 0
-            while Existe_pagina_anterior < 1:
+            while Existe_pagina_anterior < 2:
                 cont = cont + 1
                 try:
                     if cont > 14: #CADA PAGINA TEM 2 DIAS E SÓ PODE 30 DE FOLLOWER_COUNT

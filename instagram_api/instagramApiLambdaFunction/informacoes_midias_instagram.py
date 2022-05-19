@@ -1,8 +1,3 @@
-from mimetypes import init
-from time import process_time_ns
-from traceback import print_tb
-from typing_extensions import Self
-from numpy import tensordot
 import requests
 import json
 import datetime
@@ -16,7 +11,7 @@ from accessToken_e_endpoints import Parametros
 from botocore.exceptions import ClientError
 import pytz
 utc=pytz.UTC
-from dynamo_comandos import MidiasComandosDynamo
+from dynamo_comandos import ComandosDynamo
 
 
 os.system('cls' if os.name == 'nt' else 'clear')
@@ -28,11 +23,8 @@ class Informacoes_midia:
 
         parametros = Parametros()
 
-        print(parametros.params['endpoint_base'])
-        print(parametros.params['instagram_account_id'])
         # Define URL
         url = parametros.params['endpoint_base'] + parametros.params['instagram_account_id'] + '/media'
-        print(url)
         # Define Endpoint Parameters
         endpointParams = dict()
         endpointParams['fields'] = 'id,caption,media_product_type,media_type,permalink,timestamp,username,like_count,comments_count'
@@ -50,7 +42,8 @@ class Informacoes_midia:
         fotos_ids = []
         for i in range(0,len(basic_insight['data'])):
             fotos_ids.append(basic_insight['data'][i]['id']) #pegando os id's das primeiras paginas
-            
+
+
         Existe_proxima_pagina = 1
         while Existe_proxima_pagina < 1:
             
@@ -75,32 +68,44 @@ class Informacoes_midia:
         
         media_insight = []
 
+
         # Loop Over 'Media ID'
         cont = 0
+        tempo_agora = (datetime.datetime.utcnow()).astimezone(tz=None)
 
-        for id in all_basics_insights['Id'].to_list():
+        for i,id in enumerate(all_basics_insights['Id'].to_list()):
 
-            cont = cont + 1
-            parametros.params['latest_media_id'] = str(id)
-            # Define URL
-            url = parametros.params['endpoint_base'] + parametros.params['latest_media_id'] + '/insights'
+            if all_basics_insights['UTC_da_postagem'][i] + relativedelta(hours=168) > (tempo_agora): #intervalo de 7 dias entre as midias
 
-            # Define Endpoint Parameters
-            endpointParams = dict() 
-            endpointParams['metric'] = 'engagement,impressions,reach,saved,video_views'
-            endpointParams['access_token'] = parametros.params['access_token'] 
-            
-            # Requests Data
-            data = requests.get(url, endpointParams )
-            json_data_temp = json.loads(data.content)
-        
-            try:
-                media_insight.append(list(json_data_temp['data']))
+                cont = cont + 1
+                parametros.params['latest_media_id'] = str(id)
+                # Define URL
+                url = parametros.params['endpoint_base'] + parametros.params['latest_media_id'] + '/insights'
+                
+                if all_basics_insights['Local_da_midia'][i] == 'VIDEO':
 
-            except:
-                pass
+                    # Define Endpoint Parameters
+                    endpointParams = dict() 
+                    endpointParams['metric'] = 'engagement,impressions,reach,saved,video_views'
+                    endpointParams['access_token'] = parametros.params['access_token']
+                
+                else:
 
-        
+                    # Define Endpoint Parameters
+                    endpointParams = dict() 
+                    endpointParams['metric'] = 'engagement,impressions,reach,saved'
+                    endpointParams['access_token'] = parametros.params['access_token']    
+                
+                # Requests Data
+                data = requests.get(url, endpointParams )
+                json_data_temp = json.loads(data.content)
+
+                try:
+                    media_insight.append(list(json_data_temp['data']))
+
+                except:
+                    print("deu erro")
+
 
         self.data_hoje = datetime.datetime.now()
 
@@ -122,10 +127,15 @@ class Informacoes_midia:
             impressions_list.append(insight[1]['values'][0]['value'])
             reach_list.append(insight[2]['values'][0]['value'])
             saved_list.append(insight[3]['values'][0]['value'])
-            video_views.append(insight[4]['values'][0]['value'])
-            date_time.append(self.data_hoje)
+            try:
+                video_views.append(insight[4]['values'][0]['value'])
+            except:
+                video_views.append(0)
 
-                     # Create DataFrame
+            date_time.append(self.data_hoje)
+        
+        
+        # Create DataFrame
         df_media_insight = pd.DataFrame(list(zip(numero,date_time,fotos_ids, engagement_list, impressions_list, reach_list, saved_list,video_views)), columns =['Numero','Data_de_extracao','Id' , 'Engajamento', 'Impressoes', 'Alcance', 'Salvos','Visualizacoes_dos_videos'])
 
         self.all_insights = all_basics_insights.merge(df_media_insight)
@@ -134,7 +144,9 @@ class Informacoes_midia:
 
         print(self.all_insights)
 
-teste = MidiasComandosDynamo()
+        print('--> 5')
+
+teste = ComandosDynamo()
 iniciar = Informacoes_midia()
 iniciar.pegar_informacoes_midia()
 
@@ -149,8 +161,9 @@ class UtilizandoDynamo:
             teste.comando_adicionar_midias_ao_dynamo(i,iniciar)
 
 
-    def confere_e_adiciona_midias_na_base():
+    def confere_e_adiciona_midias_na_base(self):
 
+        print("1a")
         for i,id_foto in enumerate(iniciar.all_insights['Id']): #ids pegos pelo request na api  
             response = table.scan(FilterExpression= Attr('Id').eq(int(id_foto)))
 
@@ -162,8 +175,9 @@ class UtilizandoDynamo:
         
 
 
-    def adicionando_com_repeticao_por_tempo():
+    def adicionando_com_repeticao_por_tempo(self):
 
+        print('1b')
         tempo_agora = (datetime.datetime.utcnow()).astimezone(tz=None)  #tranformando na mesma formatação do pandas
 
         for i, id_foto in enumerate(iniciar.all_insights['Id']): #COMPARAR OS IDS COM OS IDS DA BASE
@@ -172,6 +186,4 @@ class UtilizandoDynamo:
                 teste.comando_adicionar_midias_ao_dynamo(i,iniciar)
 
 
-UtilizandoDynamo.adicionando_com_repeticao_por_tempo()
 
-UtilizandoDynamo.confere_e_adiciona_midias_na_base()

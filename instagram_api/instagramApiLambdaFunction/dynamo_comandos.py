@@ -1,7 +1,3 @@
-import datetime
-from doctest import testfile
-from http.client import INSUFFICIENT_STORAGE
-import string
 import boto3
 from botocore.exceptions import ClientError
 

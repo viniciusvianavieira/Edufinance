@@ -9,7 +9,7 @@ import datetime
 import os
 from dateutil.relativedelta import relativedelta
 from accessToken_e_endpoints import Parametros
-from dynamo_comandos import MidiasComandosDynamo
+from dynamo_comandos import ComandosDynamo
 import pytz
 utc=pytz.UTC
 
@@ -128,7 +128,7 @@ class Informacoes_Stories:
             print("Nenhum storie encontrado")
 
 
-teste = MidiasComandosDynamo()
+teste = ComandosDynamo()
 iniciar = Informacoes_Stories()
 iniciar.pegando_informacoes_storie()
 
@@ -143,7 +143,7 @@ class UtilizandoDynamoStories:
             teste.comando_adicionar_stories_ao_dynamo(i,iniciar)
 
 
-    def confere_e_adiciona_stories_na_base():
+    def confere_e_adiciona_stories_na_base(self):
 
         for i,id_foto in enumerate(iniciar.all_stories_informations['Id']): #ids pegos pelo request na api  
             response = table.scan(FilterExpression= Attr('Id').eq(int(id_foto)))
@@ -156,7 +156,7 @@ class UtilizandoDynamoStories:
         
 
 
-    def adicionando_com_repeticao_por_tempo():
+    def adicionando_com_repeticao_por_tempo(self):
 
         tempo_agora = (datetime.datetime.utcnow()).astimezone(tz=None)  #tranformando na mesma formatação do pandas
 
@@ -166,6 +166,6 @@ class UtilizandoDynamoStories:
                 teste.comando_adicionar_stories_ao_dynamo(i,iniciar)
 
 
-# UtilizandoDynamoStories.adiciona_stories_na_base()
-UtilizandoDynamoStories.confere_e_adiciona_stories_na_base()
-UtilizandoDynamoStories.adicionando_com_repeticao_por_tempo()
+# # UtilizandoDynamoStories.adiciona_stories_na_base()
+# UtilizandoDynamoStories.confere_e_adiciona_stories_na_base()
+# UtilizandoDynamoStories.adicionando_com_repeticao_por_tempo()

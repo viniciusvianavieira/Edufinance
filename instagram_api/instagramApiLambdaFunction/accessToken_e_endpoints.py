@@ -11,6 +11,7 @@ import os
 os.system('cls' if os.name == 'nt' else 'clear')
 print()
 
+
 class Parametros:
     
     def __init__(self):
@@ -42,7 +43,8 @@ class Parametros:
         access_token_data = json.loads(data.content)
         print(data)
         #access_token_data
-        print("Token Expires: ", datetime.datetime.fromtimestamp(access_token_data['data']['expires_at']))
+        validade = access_token_data['data']['expires_at']
+        print("Token Expires: ", datetime.datetime.fromtimestamp(validade))
         print()
 
     
@@ -64,25 +66,5 @@ class Parametros:
         long_lived_token = json.loads(data.content)
         print(long_lived_token['access_token'])
         print()
-
-
-
-#2022-06-17 15:30:36
-
-if __name__ == "__main__":
-
-    teste = Parametros()
-
-    teste.pegar_validade_access_token()
-    teste.pegar_access_token_longa_duracao()
-
-
-
-
-
-
-
-
-
-
-
+    
+    
