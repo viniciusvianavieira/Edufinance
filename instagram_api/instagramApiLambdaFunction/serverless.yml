@@ -33,13 +33,13 @@ functions:
   handlerconta:
     handler: handlerconta.informacoesconta
     events:
-      - schedule: rate(25 minutes) #roda a funcao todo dia ás 12h
+      - schedule: cron(0 12 * * ? *) #roda a funcao todo dia ás 12h
     
   #funcao2
   handlerstorie:
     handler: handlerstorie.informacoesstorie
     events:
-      - schedule: rate(25 minutes) #roda todo dia a cada 2
+      - schedule: rate(2 minutes) #roda todo dia a cada 2
 
   #funcao3
   handlermidia:

@@ -68,3 +68,5 @@ class Parametros:
         print()
     
     
+iniciar = Parametros()
+iniciar.pegar_validade_access_token()
