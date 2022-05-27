@@ -93,18 +93,15 @@ class ComandosDynamo:
                         UpdateExpression='SET Dados = :valor',
                         ExpressionAttributeValues={
                         ':valor': {
-                                "Data_do_dia": str(backup.df_account_metrics['UTC_do_dia'][i]),
-                                "Dados":{
-                                        "Alcance": str(backup.df_account_metrics['Alcance'][i]),
-                                        "Impressoes": str(backup.df_account_metrics['Impressoes'][i]),
-                                        "Numero_de_seguidores": str(backup.df_account_metrics['Numero_de_seguidores'][i]),
-                                        "Visualizacoes_do_perfil": str(backup.df_account_metrics['Visualizacoes_do_perfil'][i]),
-                                        "Cliques_no_site": str(backup.df_account_metrics['Cliques_no_site'][i]),
-                                                }
-                                        }
+                                "Alcance": str(backup.df_account_metrics['Alcance'][i]),
+                                "Impressoes": str(backup.df_account_metrics['Impressoes'][i]),
+                                "Numero_de_seguidores": str(backup.df_account_metrics['Numero_de_seguidores'][i]),
+                                "Visualizacoes_do_perfil": str(backup.df_account_metrics['Visualizacoes_do_perfil'][i]),
+                                "Cliques_no_site": str(backup.df_account_metrics['Cliques_no_site'][i]),
+
+                                }
                         }
-                )
-                
+                )               
 
         def comando_upload_iniciais_ao_dynamo(self,iniciais):
 

@@ -166,6 +166,6 @@ class UtilizandoDynamoStories:
                 teste.comando_adicionar_stories_ao_dynamo(i,iniciar)
 
 
-# # UtilizandoDynamoStories.adiciona_stories_na_base()
+# UtilizandoDynamoStories.adiciona_stories_na_base()
 # UtilizandoDynamoStories.confere_e_adiciona_stories_na_base()
 # UtilizandoDynamoStories.adicionando_com_repeticao_por_tempo()

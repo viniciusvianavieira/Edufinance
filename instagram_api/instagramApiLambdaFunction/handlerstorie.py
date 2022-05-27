@@ -1,4 +1,4 @@
-from informacoes_storie_instagram import UtilizandoDynamoStories
+from informacoes_storie_instagram  import UtilizandoDynamoStories
 
 def informacoesstorie(event, context):
 

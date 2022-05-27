@@ -1,4 +1,5 @@
 
+
 service: instagramApiLambdaFunction
 
 frameworkVersion: '3'
@@ -9,10 +10,10 @@ provider:
 
   # Extending Lambda layer
   layers:
-      - arn:aws:lambda:us-east-1:142739615414:layer:python-packages-instagramapi:1
+      - arn:aws:lambda:us-east-1:142739615414:layer:python-package-instagramapi:2
   # Variaveis de ambiente
   environment:
-      access_token: 'EAAbdojcuBagBAHH8ZAZBRNsFwqZCXxH6ANJTd6rUJFROBcviZAhu53sWlBY0eap78TIkq4QslfzytpNfpKSljZBBvxx8bGRURVZAKafgKsvxQD3Cwbj7jNncLixIY5QZB8vascURqtM3n8BIotyw0Rt3uWEObnvMiAfuBJHJ0jZCRUf2gBsMfjuuRtFEiQElhhwZD'
+      access_token: 'EAAbdojcuBagBALIE0bL5Afr0QOMIlqG0zc0GK3nntHUB9FeBgH8PetFSZAZBSZCZBIYp6LQErfn8ywzlsZBN9gW1jSaZCzCejcQmGin8LXNBc9FQ65oxHidMHR54m131hD0MeQ9cGwdedpX1YpVuk1X2jC23QafMZBFmSjJXMKH0wYZCDk7XDtMsWsWGbK6dvQwZD'
       client_id: '1932538640467368'
       client_secret: 'fd431f0e9efb648bc6ac27fffcf4cae0'
       page_id: '527015930816521'
@@ -22,6 +23,7 @@ provider:
       statements:
         - Effect: Allow
           Action:
+            - cloudformation:*
             - dynamodb:*
             - s3:*
           Resource: '*'
@@ -47,6 +49,17 @@ functions:
     events:
       - schedule: rate(25 minutes) #roda a cada 2 minutos
 
+  #funcao4
+  datastudiomidias:
+    handler: datastudiomidias.informacoesmidias
+
+  #funcao5
+  datastudiostories:
+    handler: datastudiostories.informacoesstories
+
+  #funcao6
+  datastudioconta:
+    handler: datastudioconta.informacoesconta
 
 
 resources:
