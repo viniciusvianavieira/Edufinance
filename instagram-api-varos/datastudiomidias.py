@@ -2,6 +2,7 @@ import boto3
 import pandas as pd
 import os
 from conexao_banco import conexao_aws
+import mysql.connector
 
 os.system('cls' if os.name == 'nt' else 'clear')
 print()
@@ -87,10 +88,19 @@ def informacoesmidias(event, context):
 
     usuario_sql = os.getenv('usuario_sql')
     senha_sql = os.getenv('senha_sql')
-
+    host_sql = os.getenv('host_sql')
+    database_sql = os.getenv('database_sql')
 
     aws = conexao_aws(senha = senha_sql, usuario=usuario_sql, nome_do_banco='edu_db')
     aws.iniciar_conexao()
+
+    conn = mysql.connector.connect(
+    user=usuario_sql, password=senha_sql, host=host_sql, database=database_sql
+    )   
+
+    cursor = conn.cursor()
+    cursor.execute("DROP TABLE informacoes_midias_instagram") 
+
 
     dfmidias.to_sql(
 
@@ -100,7 +110,7 @@ def informacoesmidias(event, context):
         if_exists='replace',
         index='false'
     )
-    print('botou')
+    
 
     resposta = "Tudo rodou perfeitamente"
 

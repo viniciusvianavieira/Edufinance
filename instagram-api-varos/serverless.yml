@@ -12,13 +12,16 @@ provider:
       - arn:aws:lambda:us-east-1:142739615414:layer:pyhton-packages-instagram:3
   # Variaveis de ambiente
   environment:
-      access_token: 'EAAbdojcuBagBALIE0bL5Afr0QOMIlqG0zc0GK3nntHUB9FeBgH8PetFSZAZBSZCZBIYp6LQErfn8ywzlsZBN9gW1jSaZCzCejcQmGin8LXNBc9FQ65oxHidMHR54m131hD0MeQ9cGwdedpX1YpVuk1X2jC23QafMZBFmSjJXMKH0wYZCDk7XDtMsWsWGbK6dvQwZD'
+      access_token: 'EAAbdojcuBagBACFZAYzNJ7ZCwfDo4Mp5nXTCrcoqfcPLNBfXFWf0FZCIuQfwAZAXsJXnvZCtudcXdZBMeQwYBfft17ZAPeDDQSTRahC1x4dlGuNaT8XI265YM1TLf0HcEbAv1lAZBidyIBjbUdZAZA6hTaC04NFuElguhrBkqsnIQLscsjH6QR1kXs1d8RAJHvWBUZD'
       client_id: '1932538640467368'
       client_secret: 'fd431f0e9efb648bc6ac27fffcf4cae0'
       page_id: '527015930816521'
       instagram_account_id: '17841406234741156'
       usuario_sql: 'eduadmin'
       senha_sql: '21Varos!21'
+      host_sql: 'base-edu.c2cxonpshmlt.us-east-1.rds.amazonaws.com'
+      database_sql: 'edu_db'
+
 
   iam:
     role: 
@@ -57,21 +60,21 @@ functions:
     handler: datastudiomidias.informacoesmidias
     timeout: 50 #tempo de duração da função
     events:
-      - schedule: rate(10 minutes) #roda a funcao todo dia ás 08h
+      - schedule: rate(4 hours) #roda a funcao de 4 em 4h
 
   #funcao5
   datastudiostories:
     handler: datastudiostories.informacoesstories
     timeout: 50 #tempo de duração da função
     events:
-      - schedule: rate(10 minutes)  #roda a funcao todo dia ás 08h
+      - schedule: rate(4 hours)  #roda a funcao de 4 em 4h
 
   #funcao6
   datastudioconta:
     handler: datastudioconta.informacoesconta
     timeout: 50 #tempo de duração da função
     events:
-      - schedule: rate(10 minutes) #roda a funcao todo dia ás 08h
+      - schedule: rate(4 hours) #roda a funcao de 4 em 4h
 
 
 

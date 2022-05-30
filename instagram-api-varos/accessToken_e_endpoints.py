@@ -68,6 +68,6 @@ class Parametros:
         print()
     
     
-# iniciar = Parametros()
-# iniciar.pegar_validade_access_token()
-# iniciar.pegar_access_token_longa_duracao()
+iniciar = Parametros()
+iniciar.pegar_validade_access_token()
+iniciar.pegar_access_token_longa_duracao()
