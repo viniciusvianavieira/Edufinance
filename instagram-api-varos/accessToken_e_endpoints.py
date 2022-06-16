@@ -66,8 +66,24 @@ class Parametros:
         long_lived_token = json.loads(data.content)
         print(long_lived_token['access_token'])
         print()
-    
-    
-iniciar = Parametros()
-iniciar.pegar_validade_access_token()
-iniciar.pegar_access_token_longa_duracao()
+
+    def atualizar_access_token_longa_duracao(self):
+        # Define URL
+        url = self.params['endpoint_base'] + '/refresh_access_token'
+        self.endpointparams = dict() 
+        self.endpointparams['grant_type'] = 'ig_refresh_token'
+        self.endpointparams['access_token'] = self.params['access_token']
+
+        # Requests Data
+        data = requests.get(url, self.endpointparams )
+        refresh_long_lived_token = json.loads(data.content)
+        print(url)
+        print(refresh_long_lived_token)
+        print()
+
+
+#Token Expires:  2022-07-29 12:10:07
+# iniciar = Parametros()
+# iniciar.pegar_validade_access_token()
+# iniciar.pegar_access_token_longa_duracao()
+# iniciar.atualizar_access_token_longa_duracao()

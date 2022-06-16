@@ -2,6 +2,8 @@ import boto3
 import pandas as pd
 import os
 from conexao_banco import conexao_aws
+
+
 os.system('cls' if os.name == 'nt' else 'clear')
 print()
 import mysql.connector
@@ -12,7 +14,12 @@ def informacoesstories(event, context):
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table('informacoes_stories_instagram')
 
-    response = table.scan()['Items']
+    response = table.scan()
+    data = response['Items']
+
+    while 'LastEvaluatedKey' in response:
+        response = table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
+        data.extend(response['Items'])
 
     Data_de_extracao = []
     Id = []
@@ -26,8 +33,11 @@ def informacoesstories(event, context):
     Tipo_da_midia = []
     Local_da_midia = []
     UTC_da_postagem = []
+    Thumbnail = []
+    Media_url = []
+    
 
-    for i,item in enumerate(response):
+    for i,item in enumerate(data):
         Data_de_extracao.append(item['Data_de_extracao'])
         Id.append(item['Id'])
 
@@ -78,10 +88,18 @@ def informacoesstories(event, context):
         try:
             Local_da_midia.append(item['Metricas']['Informacoes']['Local_da_midia'])
         except:
-            UTC_da_postagem.append('---')        
+            Local_da_midia.append('---')
+        try:
+            Media_url.append(item['Metricas']['Informacoes']['Media_url'])
+        except:
+            Media_url.append('---')
+        try:
+            Thumbnail.append(item['Metricas']['Informacoes']['Thumbnail'])
+        except:
+            Thumbnail.append('---')                    
 
     
-    dfstories = pd.DataFrame(list(zip(Data_de_extracao, Id, Saidas, Alcance, Respostas, Impressoes, Likes, Toques_para_avancar, Toques_para_voltar, Tipo_da_midia, Local_da_midia, UTC_da_postagem)),columns=['Data_de_extracao','Id','Saidas','Alcance','Respostas','Impressoes','Likes','Toques_para_avancar','Toques_para_voltar','Tipo_da_midia','Local_da_midia','UTC_da_postagem'])
+    dfstories = pd.DataFrame(list(zip(Data_de_extracao, Id, Saidas, Alcance, Respostas, Impressoes, Likes, Toques_para_avancar, Toques_para_voltar, Tipo_da_midia, Local_da_midia, UTC_da_postagem, Media_url, Thumbnail)),columns=['Data_de_extracao','Id','Saidas','Alcance','Respostas','Impressoes','Likes','Toques_para_avancar','Toques_para_voltar','Tipo_da_midia','Local_da_midia','UTC_da_postagem','Media_url','Thumbnail'])
     
 
     print(dfstories)
@@ -100,15 +118,31 @@ def informacoesstories(event, context):
     )   
 
     cursor = conn.cursor()
-    cursor.execute("DROP TABLE informacoes_stories_instagram") 
+    cursor.execute("""DROP TABLE IF EXISTS `informacoes_stories_instagram`;""")
+    conn.commit()
+    cursor.execute("""  create table informacoes_stories_instagram(
+                        Indice int NOT NULL AUTO_INCREMENT primary key,
+                        Data_de_extracao datetime,
+                        Id varchar(20),
+                        Saidas bigint(20),
+                        Alcance bigint(20),
+                        Respostas bigint(20),
+                        Impressoes bigint(20),
+                        Likes bigint(20),
+                        Toques_para_avancar bigint(20),
+                        Toques_para_voltar bigint(20),
+                        Tipo_da_midia varchar(25),
+                        Local_da_midia varchar(25),
+                        UTC_da_postagem datetime,
+                        Media_url varchar(350),
+                        Thumbnail varchar(350));""") 
 
     dfstories.to_sql(
         name='informacoes_stories_instagram',
         con=aws.engine,
         schema='edu_db',
-        if_exists='replace',
-        index='false'
-    )
+        if_exists='append',
+        index=False)
 
     resposta = "Tudo rodou perfeitamente"
 

@@ -12,7 +12,7 @@ provider:
       - arn:aws:lambda:us-east-1:142739615414:layer:pyhton-packages-instagram:3
   # Variaveis de ambiente
   environment:
-      access_token: 'EAAbdojcuBagBACFZAYzNJ7ZCwfDo4Mp5nXTCrcoqfcPLNBfXFWf0FZCIuQfwAZAXsJXnvZCtudcXdZBMeQwYBfft17ZAPeDDQSTRahC1x4dlGuNaT8XI265YM1TLf0HcEbAv1lAZBidyIBjbUdZAZA6hTaC04NFuElguhrBkqsnIQLscsjH6QR1kXs1d8RAJHvWBUZD'
+      access_token: 'EAAbdojcuBagBAGXZAIqMHZAMQE7vE8wuOtNQPloCGRuArc7ZAAdcZBo18nhVmhau6wfiOemklhrZCqMSp6LL1dx2oJ8HhgroE5TMaAjuPFgQgW9AjaOeEPq1nGCB1cZAZBCqlKUAp90dshL67UBI8gFj40cVuTk7wa7LNAjQj10WglPkXXdt4gBuLtqanJ1ntMZD'
       client_id: '1932538640467368'
       client_secret: 'fd431f0e9efb648bc6ac27fffcf4cae0'
       page_id: '527015930816521'
@@ -39,6 +39,7 @@ functions:
   #função1
   handlerconta:
     handler: handlerconta.informacoesconta
+    timeout: 50 #tempo de duração da função
     events:
       - schedule: cron(0 12 * * ? *) #roda a funcao todo dia ás 12h
     
@@ -52,6 +53,7 @@ functions:
   #funcao3
   handlermidias:
     handler: handlermidias.informacoesmidias
+    timeout: 50 #tempo de duração da função
     events:
       - schedule: rate(25 minutes) #roda a cada 2 minutos
 
@@ -75,8 +77,20 @@ functions:
     timeout: 50 #tempo de duração da função
     events:
       - schedule: rate(4 hours) #roda a funcao de 4 em 4h
+  
+  #funcao7
+  handlerfotosmidias:
+    handler: handlerfotosmidias.handleruploadfotosmidias
+    timeout: 50 #tempo de duração da função
+    events:
+      - schedule: cron(0 8 * * ? *) #roda a funcao todo dia as 08:00 horas
 
-
+  #funcao8
+  handlerfotosstories:
+    handler: handlerfotosstories.handleruploadfotosstories
+    timeout: 50 #tempo de duração da função
+    events:
+      - schedule: cron(0 8 * * ? *) #roda a funcao todo dia as 08:00 horas
 
 
 

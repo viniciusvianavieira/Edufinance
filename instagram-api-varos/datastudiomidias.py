@@ -13,7 +13,12 @@ def informacoesmidias(event, context):
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table('informacoes_midias_instagram')
 
-    response = table.scan()['Items']
+    response = table.scan()
+    data = response['Items']
+
+    while 'LastEvaluatedKey' in response:
+        response = table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
+        data.extend(response['Items'])
 
     Data_de_extracao = []
     Id = []
@@ -27,8 +32,12 @@ def informacoesmidias(event, context):
     Tipo_da_midia = []
     Local_da_midia = []
     UTC_da_postagem = []
+    Link = []
+    Url = []
 
-    for i,item in enumerate(response):
+
+    for i,item in enumerate(data):
+
         Data_de_extracao.append(item['Data_de_extracao'])
         Id.append(item['Id'])
 
@@ -79,10 +88,20 @@ def informacoesmidias(event, context):
         try:
             Local_da_midia.append(item['Metricas']['Informacoes']['Local_da_midia'])
         except:
-            UTC_da_postagem.append('---')
+            Local_da_midia.append('---')
+        try:
+            Link.append(item['Metricas']['Informacoes']['Link'])
+        except:
+            Link.append('---')
+        try:
+            Url.append(item['Metricas']['Informacoes']['URL'])
+        except:
+            Url.append('---')
+
+
 
     
-    dfmidias = pd.DataFrame(list(zip(Data_de_extracao, Id, Engajamento, Alcance, Comentarios, Impressoes, Likes, Salvos, Visualizacoes_dos_videos, Tipo_da_midia, Local_da_midia, UTC_da_postagem)),columns=['Data_de_extracao','Id','Engajamento','Alcance','Comentarios','Impressoes','Likes','Salvos','Visualizacoes_dos_videos','Tipo_da_midia','Local_da_midia','UTC_da_postagem'])
+    dfmidias = pd.DataFrame(list(zip(Data_de_extracao, Id, Engajamento, Alcance, Comentarios, Impressoes, Likes, Salvos, Visualizacoes_dos_videos, Tipo_da_midia, Local_da_midia, UTC_da_postagem,Link, Url)),columns=['Data_de_extracao','Id','Engajamento','Alcance','Comentarios','Impressoes','Likes','Salvos','Visualizacoes_dos_videos','Tipo_da_midia','Local_da_midia','UTC_da_postagem', 'Link', 'URL'])
    
     print(dfmidias)
 
@@ -99,7 +118,24 @@ def informacoesmidias(event, context):
     )   
 
     cursor = conn.cursor()
-    cursor.execute("DROP TABLE informacoes_midias_instagram") 
+    cursor.execute("""DROP TABLE IF EXISTS `informacoes_midias_instagram`;""")
+    conn.commit()
+    cursor.execute("""  create table informacoes_midias_instagram(
+                        Indice int NOT NULL AUTO_INCREMENT primary key,
+                        Data_de_extracao datetime,
+                        Id varchar(20),
+                        Engajamento bigint(20),
+                        Alcance bigint(20),
+                        Comentarios bigint(20),
+                        Impressoes bigint(20),
+                        Likes bigint(20),
+                        Salvos bigint(20),
+                        Visualizacoes_dos_videos bigint(20),
+                        Tipo_da_midia varchar(25),
+                        Local_da_midia varchar(25),
+                        UTC_da_postagem datetime,
+                        Link varchar(350),
+                        URL varchar(350));;""") 
 
 
     dfmidias.to_sql(
@@ -107,10 +143,9 @@ def informacoesmidias(event, context):
         name='informacoes_midias_instagram',
         con=aws.engine,
         schema='edu_db',
-        if_exists='replace',
-        index='false'
-    )
-    
+        if_exists='append',
+        index=False)
+        
 
     resposta = "Tudo rodou perfeitamente"
 

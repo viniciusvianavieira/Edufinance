@@ -29,6 +29,7 @@ class ComandosDynamo:
                                                         'Link':str(iniciar.all_insights['Link'][i]),
                                                         'Legenda': str(iniciar.all_insights['Legenda'][i]),
                                                         'Local_da_midia': str(iniciar.all_insights['Local_da_midia'][i]),
+                                                        'URL': str(iniciar.all_insights['URL'][i]),
                                                                 },
                                                         }
                                         
@@ -61,7 +62,8 @@ class ComandosDynamo:
                                                         'Link':str(iniciar.all_stories_informations['Link'][i]),
                                                         'Legenda': str(iniciar.all_stories_informations['Legenda'][i]),
                                                         'Local_da_midia': str(iniciar.all_stories_informations['Local_da_midia'][i]),
-                                                        'Thumbnail_url': str(iniciar.all_stories_informations['Thumbnail_url'][i]),
+                                                        'Media_url': str(iniciar.all_stories_informations['Media_url'][i]),
+                                                        'Thumbnail': str(iniciar.all_stories_informations['Thumbnail'][i]),                                                     
                                                                 },
                                                         }
                                         
@@ -125,7 +127,43 @@ class ComandosDynamo:
                 )
 
 
-        
+
+
+                dynamodb = boto3.resource('dynamodb')
+                table = dynamodb.Table('informacoes_conta_instagram')
+
+                table.update_item(
+                        Key={
+                                'Data_de_extracao' : str(iniciar.data_hoje),
+                                'Id': int(iniciar.all_insights['Id'][i]),
+                         },
+                        UpdateExpression='SET Metricas = :valor',
+                        ExpressionAttributeValues={
+                        ':valor': {
+                                'Dados':{
+                                        'Likes': str(iniciar.all_insights['Likes'][i]),
+                                        'Comentarios': str(iniciar.all_insights['Comentarios'][i]),
+                                        'Engajamento': str(iniciar.all_insights['Engajamento'][i]),
+                                        'Impressoes': str(iniciar.all_insights['Impressoes'][i]),
+                                        'Alcance': str(iniciar.all_insights['Alcance'][i]),
+                                        'Salvos':str(iniciar.all_insights['Salvos'][i]),
+                                        'Visualizacoes_dos_videos': str(iniciar.all_insights['Visualizacoes_dos_videos'][i]),
+                                        },
+                                'Informacoes':{
+                                        'UTC_da_postagem': str(iniciar.all_insights['UTC_da_postagem'][i]),
+                                        'Tipo_da_midia': str(iniciar.all_insights['Tipo_da_midia'][i]),
+                                        'Username': str(iniciar.all_insights['Username'][i]),
+                                        'Link':str(iniciar.all_insights['Link'][i]),
+                                        'Legenda': str(iniciar.all_insights['Legenda'][i]),
+                                        'Local_da_midia': str(iniciar.all_insights['Local_da_midia'][i]),
+                                                },
+
+                                }
+                        }
+                
+                )
+
+
 
                                 
 

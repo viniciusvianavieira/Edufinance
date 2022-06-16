@@ -85,6 +85,7 @@ class Informacoes_Stories:
             timestamp_fields = []
             username_fields = []
             caption_fields = []
+            thumbnail_fields = []
 
             for id in json_stories_id['id'].to_list():
                 url = parametros.params['endpoint_base'] + id   
@@ -97,6 +98,7 @@ class Informacoes_Stories:
                 # Requests Data
                 data = requests.get(url, endpointParams)
                 json_stories_fields = json.loads(data.content)
+                print(json_stories_fields)
             
                 id_storie_fields.append(id)
                 like_count_storie_fields.append(json_stories_fields['like_count'])
@@ -107,16 +109,20 @@ class Informacoes_Stories:
                 shortcode_fields.append(json_stories_fields['shortcode'])
                 timestamp_fields.append(json_stories_fields['timestamp'])
                 username_fields.append(json_stories_fields['username'])
+                
+
                 try:
                     caption_fields.append(json_stories_fields['caption'])
+                    thumbnail_fields.append(json_stories_fields['thumbnail'])
                 except:
                     caption_fields.append('------')
+                    thumbnail_fields.append('------')
                 
-                df_fields_stories = pd.DataFrame(list(zip(id_storie_fields, like_count_storie_fields, media_product_type_fields, media_type_fields, media_url_fields, permalink_fields,timestamp_fields, username_fields, caption_fields)), columns =['Id','Likes','Local_da_midia','Tipo_da_midia', 'Thumbnail_url','Link','UTC_da_postagem','Username', 'Legenda'])
+                df_fields_stories = pd.DataFrame(list(zip(id_storie_fields, like_count_storie_fields, media_product_type_fields, media_type_fields, media_url_fields, permalink_fields,timestamp_fields, username_fields, caption_fields,thumbnail_fields)), columns =['Id','Likes','Local_da_midia','Tipo_da_midia', 'Media_url','Link','UTC_da_postagem','Username', 'Legenda','Thumbnail'])
         
             self.all_stories_informations = pd.merge(df_fields_stories,  df_insights_stories, how='left', on = 'Id')
 
-            self.all_stories_informations = self.all_stories_informations[['Id','UTC_da_postagem','Data_de_extracao','Likes','Impressoes','Alcance','Respostas','Saidas','Toques_para_voltar','Toques_para_avancar','Tipo_da_midia','Username','Link', 'Thumbnail_url','Local_da_midia','Legenda']]
+            self.all_stories_informations = self.all_stories_informations[['Id','UTC_da_postagem','Data_de_extracao','Likes','Impressoes','Alcance','Respostas','Saidas','Toques_para_voltar','Toques_para_avancar','Tipo_da_midia','Username','Link', 'Media_url','Local_da_midia','Legenda','Thumbnail']]
 
 
             self.all_stories_informations['Id'] = self.all_stories_informations['Id'].astype(int)
@@ -127,6 +133,7 @@ class Informacoes_Stories:
 
             print(self.all_stories_informations)
 
+  
         except:
             print("Nenhum storie encontrado")
 

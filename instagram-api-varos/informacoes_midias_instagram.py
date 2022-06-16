@@ -7,6 +7,7 @@ import os
 import boto3
 from boto3.dynamodb.conditions import Key, Attr
 from dateutil.relativedelta import relativedelta
+from sqlalchemy import true
 from accessToken_e_endpoints import Parametros
 from botocore.exceptions import ClientError
 import pytz
@@ -26,8 +27,9 @@ class Informacoes_midia:
         # Define URL
         url = parametros.params['endpoint_base'] + parametros.params['instagram_account_id'] + '/media'
         # Define Endpoint Parameters
+        print(url)
         endpointParams = dict()
-        endpointParams['fields'] = 'id,caption,media_product_type,media_type,permalink,timestamp,username,like_count,comments_count'
+        endpointParams['fields'] = 'id,caption,media_product_type,media_type,permalink,timestamp,username,like_count,comments_count,media_url'
         endpointParams['access_token'] = parametros.params['access_token']
 
         # Requests Data
@@ -43,13 +45,14 @@ class Informacoes_midia:
         for i in range(0,len(basic_insight['data'])):
             fotos_ids.append(basic_insight['data'][i]['id']) #pegando os id's das primeiras paginas
 
-
+        print('1')
         Existe_proxima_pagina = 0
-        while Existe_proxima_pagina < 1:
+        while Existe_proxima_pagina < 40:
             
             try:
                 Existe_proxima_pagina = Existe_proxima_pagina + 1
                 url_next = basic_insight['paging']['next']
+
                 data_next = requests.get(url_next)
                 basic_insight = json.loads(data_next.content)
                 for i in range(0,len(basic_insight['data'])):
@@ -58,30 +61,33 @@ class Informacoes_midia:
             except Exception as e:
                 Existe_proxima_pagina = False #QUANDO QUERO PEGAR A BASE DE DADOS TODA
                 break
-        
+            
             lista_df_insights.append(pd.DataFrame(basic_insight['data']))
 
-        all_basics_insights = pd.concat(lista_df_insights, ignore_index=True)
-        all_basics_insights.columns = ['Id', 'Legenda', 'Local_da_midia','Tipo_da_midia', 'Link', 'UTC_da_postagem', 'Username', 'Likes', 'Comentarios']
+        all_basics_insights = pd.concat(lista_df_insights, ignore_index=True, sort=False)
+        print(all_basics_insights)
+                                    #  'id,  caption, media_product_type,   media_type, permalink, timestamp,        username, like_count, comments_count,     media_url'
+        all_basics_insights.columns = ['Id', 'Legenda', 'Local_da_midia','Tipo_da_midia', 'Link', 'UTC_da_postagem', 'Username', 'Likes', 'Comentarios', 'URL']
+        print('2')
 
-        all_basics_insights['UTC_da_postagem'] = pd.to_datetime(all_basics_insights['UTC_da_postagem'], format='%Y-%m-%d')
-        
+        all_basics_insights['UTC_da_postagem'] = pd.to_datetime(all_basics_insights['UTC_da_postagem'])
+
+
         media_insight = []
-
+        
 
         # Loop Over 'Media ID'
         cont = 0
         tempo_agora = (datetime.datetime.utcnow()).astimezone(tz=None)
-
         for i,id in enumerate(all_basics_insights['Id'].to_list()):
 
-            if all_basics_insights['UTC_da_postagem'][i] + relativedelta(hours=168) > (tempo_agora): #intervalo de 7 dias entre as midias
+            if all_basics_insights['UTC_da_postagem'][i] + relativedelta(hours=168) < (tempo_agora): #intervalo de 7 dias entre as midias
 
                 cont = cont + 1
                 parametros.params['latest_media_id'] = str(id)
                 # Define URL
                 url = parametros.params['endpoint_base'] + parametros.params['latest_media_id'] + '/insights'
-                
+                print(url)
                 if all_basics_insights['Local_da_midia'][i] == 'VIDEO':
 
                     # Define Endpoint Parameters
@@ -99,14 +105,14 @@ class Informacoes_midia:
                 # Requests Data
                 data = requests.get(url, endpointParams )
                 json_data_temp = json.loads(data.content)
-
+                print(json_data_temp)
                 try:
                     media_insight.append(list(json_data_temp['data']))
 
                 except:
                     print("deu erro")
 
-
+        print('3')
         self.data_hoje = datetime.datetime.now()
 
         # Initialize Empty Container
@@ -130,7 +136,7 @@ class Informacoes_midia:
             try:
                 video_views.append(insight[4]['values'][0]['value'])
             except:
-                video_views.append(0)
+                video_views.append()
 
             date_time.append(self.data_hoje)
         
@@ -138,11 +144,13 @@ class Informacoes_midia:
         # Create DataFrame
         df_media_insight = pd.DataFrame(list(zip(numero,date_time,fotos_ids, engagement_list, impressions_list, reach_list, saved_list,video_views)), columns =['Numero','Data_de_extracao','Id' , 'Engajamento', 'Impressoes', 'Alcance', 'Salvos','Visualizacoes_dos_videos'])
 
+
         self.all_insights = all_basics_insights.merge(df_media_insight)
 
-        self.all_insights = self.all_insights[['Id','Data_de_extracao','UTC_da_postagem','Likes','Comentarios',"Engajamento",'Impressoes','Alcance','Salvos','Visualizacoes_dos_videos','Tipo_da_midia','Username','Link','Legenda','Local_da_midia']]
+        self.all_insights = self.all_insights[['Id','Data_de_extracao','UTC_da_postagem','Likes','Comentarios',"Engajamento",'Impressoes','Alcance','Salvos','Visualizacoes_dos_videos','Tipo_da_midia','Username','Link','Legenda','Local_da_midia', 'URL']]
 
         print(self.all_insights)
+        
         
 
 
@@ -151,15 +159,18 @@ iniciar = Informacoes_midia()
 iniciar.pegar_informacoes_midia()
 
 dynamodb = boto3.resource('dynamodb')
+# table = dynamodb.Table('informacoes_midias_instagram')
 table = dynamodb.Table('informacoes_midias_instagram')
-
 
 class UtilizandoDynamo:
 
-    def adiciona_midias_na_base():
+    def adiciona_midias_na_base(self):
         for i,postagem in enumerate(iniciar.all_insights['UTC_da_postagem']):
             teste.comando_adicionar_midias_ao_dynamo(i,iniciar)
 
+    def adiciona_Teste(self):
+        for i,postagem in enumerate(iniciar.all_insights['UTC_da_postagem']):
+            teste.comando_adicionar_Teste(i,iniciar)
 
     def confere_e_adiciona_midias_na_base(self):
 
@@ -184,16 +195,5 @@ class UtilizandoDynamo:
                 teste.comando_adicionar_midias_ao_dynamo(i,iniciar)
 
 
-        
-
-# usuario_sql = os.getenv('usuario_sql')
-# senha_sql = os.getenv('senha_sql')
-
-# aws = conexao_aws(senha = senha_sql, usuario=usuario_sql, nome_do_banco='edu_db')
-# aws.iniciar_conexao()
 
 
-# a = pd.read_sql('''SELECT * from edu_db.informacoes_midias_instagram''', con = aws.engine)
-# print(a) 
-
-# iniciar.all_insights.to_sql('informacoes_midias_instagram', aws.engine, index=False, if_exists='append', chunksize=10000, method='multi')
