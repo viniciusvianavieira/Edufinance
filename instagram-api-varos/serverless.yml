@@ -23,8 +23,8 @@ provider:
       senha_sql: '21Varos!21'
       host_sql: 'base-edu.c2cxonpshmlt.us-east-1.rds.amazonaws.com'
       database_sql: 'edu_db'
-      access_key_aws: 'AKIASCO7RV23CJ6H2ISP'
-      secret_key_aws: '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'
+      access_key_aws: 
+      secret_key_aws: 
 
 
   iam:
