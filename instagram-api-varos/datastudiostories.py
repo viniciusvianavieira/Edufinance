@@ -1,17 +1,21 @@
+import mysql.connector
 import boto3
 import pandas as pd
 import os
 from conexao_banco import conexao_aws
+from dateutil.relativedelta import relativedelta
+from boto3 import client
+import datetime
+from datetime import date, datetime
 
 
 os.system('cls' if os.name == 'nt' else 'clear')
 print()
-import mysql.connector
 
 
 def informacoesstories(event, context):
 
-    dynamodb = boto3.resource('dynamodb')
+    dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
     table = dynamodb.Table('informacoes_stories_instagram')
 
     response = table.scan()
@@ -35,12 +39,13 @@ def informacoesstories(event, context):
     UTC_da_postagem = []
     Thumbnail = []
     Media_url = []
-    
+    awsurl = []
 
-    for i,item in enumerate(data):
+    tempo_agora = datetime.strptime(str((datetime.utcnow())), '%Y-%m-%d %H:%M:%S.%f').date()
+
+    for i, item in enumerate(data):
         Data_de_extracao.append(item['Data_de_extracao'])
         Id.append(item['Id'])
-
         try:
             Alcance.append(item['Metricas']['Dados']['Alcance'])
         except:
@@ -55,7 +60,7 @@ def informacoesstories(event, context):
             Saidas.append(item['Metricas']['Dados']['Saidas'])
         except:
             Saidas.append('---')
-            
+
         try:
             Impressoes.append(item['Metricas']['Dados']['Impressoes'])
         except:
@@ -75,18 +80,21 @@ def informacoesstories(event, context):
             Toques_para_voltar.append(item['Metricas']['Dados']['Toques_para_voltar'])
         except:
             Toques_para_voltar.append('---')
-        
+
         try:
-            Tipo_da_midia.append(item['Metricas']['Informacoes']['Tipo_da_midia'])
+            Tipo_da_midia.append(
+                item['Metricas']['Informacoes']['Tipo_da_midia'])
         except:
             Tipo_da_midia.append('---')
 
         try:
-            UTC_da_postagem.append(item['Metricas']['Informacoes']['UTC_da_postagem'])
+            UTC_da_postagem.append(
+                item['Metricas']['Informacoes']['UTC_da_postagem'])
         except:
             UTC_da_postagem.append('---')
         try:
-            Local_da_midia.append(item['Metricas']['Informacoes']['Local_da_midia'])
+            Local_da_midia.append(
+                item['Metricas']['Informacoes']['Local_da_midia'])
         except:
             Local_da_midia.append('---')
         try:
@@ -96,11 +104,17 @@ def informacoesstories(event, context):
         try:
             Thumbnail.append(item['Metricas']['Informacoes']['Thumbnail'])
         except:
-            Thumbnail.append('---')                    
+            Thumbnail.append('---')
 
+        try:
+            awsurl.append(item['Metricas']['Informacoes']['AWS_URL'])
+        except:
+            awsurl.append('---')
+
+     
     
-    dfstories = pd.DataFrame(list(zip(Data_de_extracao, Id, Saidas, Alcance, Respostas, Impressoes, Likes, Toques_para_avancar, Toques_para_voltar, Tipo_da_midia, Local_da_midia, UTC_da_postagem, Media_url, Thumbnail)),columns=['Data_de_extracao','Id','Saidas','Alcance','Respostas','Impressoes','Likes','Toques_para_avancar','Toques_para_voltar','Tipo_da_midia','Local_da_midia','UTC_da_postagem','Media_url','Thumbnail'])
-    
+    dfstories = pd.DataFrame(list(zip(Data_de_extracao, Id, Saidas, Alcance, Respostas, Impressoes, Likes, Toques_para_avancar, Toques_para_voltar, Tipo_da_midia, Local_da_midia, UTC_da_postagem, Media_url, Thumbnail, awsurl)), columns=[
+                             'Data_de_extracao', 'Id', 'Saidas', 'Alcance', 'Respostas', 'Impressoes', 'Likes', 'Toques_para_avancar', 'Toques_para_voltar', 'Tipo_da_midia', 'Local_da_midia', 'UTC_da_postagem', 'Media_url', 'Thumbnail', 'AWS_URL'])
 
     print(dfstories)
 
@@ -109,13 +123,13 @@ def informacoesstories(event, context):
     host_sql = os.getenv('host_sql')
     database_sql = os.getenv('database_sql')
 
-
-    aws = conexao_aws(senha = senha_sql, usuario=usuario_sql, nome_do_banco='edu_db')
+    aws = conexao_aws(senha=senha_sql, usuario=usuario_sql,
+                      nome_do_banco='edu_db')
     aws.iniciar_conexao()
 
     conn = mysql.connector.connect(
-    user=usuario_sql, password=senha_sql, host=host_sql, database=database_sql
-    )   
+        user=usuario_sql, password=senha_sql, host=host_sql, database=database_sql
+    )
 
     cursor = conn.cursor()
     cursor.execute("""DROP TABLE IF EXISTS `informacoes_stories_instagram`;""")
@@ -134,8 +148,9 @@ def informacoesstories(event, context):
                         Tipo_da_midia varchar(25),
                         Local_da_midia varchar(25),
                         UTC_da_postagem datetime,
-                        Media_url varchar(350),
-                        Thumbnail varchar(350));""") 
+                        Media_url varchar(5000),
+                        Thumbnail varchar(5000),
+                        AWS_URL varchar(5000));""")
 
     dfstories.to_sql(
         name='informacoes_stories_instagram',

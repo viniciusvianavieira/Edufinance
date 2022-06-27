@@ -1,4 +1,6 @@
 
+
+
 service: instagram-api-varos
 
 frameworkVersion: '3'
@@ -12,7 +14,7 @@ provider:
       - arn:aws:lambda:us-east-1:142739615414:layer:pyhton-packages-instagram:3
   # Variaveis de ambiente
   environment:
-      access_token: 'EAAbdojcuBagBAGXZAIqMHZAMQE7vE8wuOtNQPloCGRuArc7ZAAdcZBo18nhVmhau6wfiOemklhrZCqMSp6LL1dx2oJ8HhgroE5TMaAjuPFgQgW9AjaOeEPq1nGCB1cZAZBCqlKUAp90dshL67UBI8gFj40cVuTk7wa7LNAjQj10WglPkXXdt4gBuLtqanJ1ntMZD'
+      access_token: 'EAAbdojcuBagBAOJZBAZAMkHIOCvEj8vJFgcAwfn74AN7oU3AWo2TmaiSLUgja8eO6UR0j8eYIKmq0vMSuZC22inLOwIOlCzwwvB4iQsn83ca0XudTc1HU9PUTJjFQd9vawwKoHBaJghU1sYLvsUpRL2ixWj1FnMfoQtJXPbTn0zi1MfMwZBLgJaQd5nUz1kZD'
       client_id: '1932538640467368'
       client_secret: 'fd431f0e9efb648bc6ac27fffcf4cae0'
       page_id: '527015930816521'
@@ -21,6 +23,8 @@ provider:
       senha_sql: '21Varos!21'
       host_sql: 'base-edu.c2cxonpshmlt.us-east-1.rds.amazonaws.com'
       database_sql: 'edu_db'
+      access_key_aws: 'AKIASCO7RV23CJ6H2ISP'
+      secret_key_aws: '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'
 
 
   iam:
@@ -41,7 +45,7 @@ functions:
     handler: handlerconta.informacoesconta
     timeout: 50 #tempo de duração da função
     events:
-      - schedule: cron(0 12 * * ? *) #roda a funcao todo dia ás 12h
+      - schedule: rate(2 hours) #roda a funcao todo dia ás 12h
     
   #funcao2
   handlerstories:
@@ -55,42 +59,42 @@ functions:
     handler: handlermidias.informacoesmidias
     timeout: 50 #tempo de duração da função
     events:
-      - schedule: rate(25 minutes) #roda a cada 2 minutos
+      - schedule: rate(2 minutes) #roda a cada 2 minutos
 
   #funcao4
   datastudiomidias:
     handler: datastudiomidias.informacoesmidias
     timeout: 50 #tempo de duração da função
     events:
-      - schedule: rate(4 hours) #roda a funcao de 4 em 4h
+      - schedule: rate(10 minutes) #roda a funcao de 4 em 4h
 
   #funcao5
   datastudiostories:
     handler: datastudiostories.informacoesstories
     timeout: 50 #tempo de duração da função
     events:
-      - schedule: rate(4 hours)  #roda a funcao de 4 em 4h
+      - schedule: rate(10 minutes)  #roda a funcao de 4 em 4h
 
   #funcao6
   datastudioconta:
     handler: datastudioconta.informacoesconta
     timeout: 50 #tempo de duração da função
     events:
-      - schedule: rate(4 hours) #roda a funcao de 4 em 4h
+      - schedule: rate(10 minutes) #roda a funcao de 4 em 4h
   
   #funcao7
   handlerfotosmidias:
     handler: handlerfotosmidias.handleruploadfotosmidias
     timeout: 50 #tempo de duração da função
     events:
-      - schedule: cron(0 8 * * ? *) #roda a funcao todo dia as 08:00 horas
+      - schedule: rate(10 minutes) #roda a funcao todo dia as 08:00 horas
 
   #funcao8
   handlerfotosstories:
     handler: handlerfotosstories.handleruploadfotosstories
     timeout: 50 #tempo de duração da função
     events:
-      - schedule: cron(0 8 * * ? *) #roda a funcao todo dia as 08:00 horas
+      - schedule: rate(10 minutes) #roda a funcao todo dia as 08:00 horas
 
 
 

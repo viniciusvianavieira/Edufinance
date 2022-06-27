@@ -20,7 +20,7 @@ class informacoes_conta_lambda_function:
                 iniciais = informacoes_iniciais_conta_instagram()
                 iniciais.pegando_informacoes_iniciais()
 
-                dynamodb = boto3.resource('dynamodb')
+                dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
                 table = dynamodb.Table('informacoes_conta_instagram')
 
                 table.put_item(

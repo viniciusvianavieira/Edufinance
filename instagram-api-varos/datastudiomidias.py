@@ -10,7 +10,7 @@ print()
 
 def informacoesmidias(event, context):
 
-    dynamodb = boto3.resource('dynamodb')
+    dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
     table = dynamodb.Table('informacoes_midias_instagram')
 
     response = table.scan()
@@ -34,6 +34,7 @@ def informacoesmidias(event, context):
     UTC_da_postagem = []
     Link = []
     Url = []
+    Thumbnail = []
 
 
     for i,item in enumerate(data):
@@ -97,11 +98,15 @@ def informacoesmidias(event, context):
             Url.append(item['Metricas']['Informacoes']['URL'])
         except:
             Url.append('---')
+        try:
+            Thumbnail.append(item['Metricas']['Informacoes']['Thumbnail'])
+        except:
+            Thumbnail.append('---')
 
 
 
     
-    dfmidias = pd.DataFrame(list(zip(Data_de_extracao, Id, Engajamento, Alcance, Comentarios, Impressoes, Likes, Salvos, Visualizacoes_dos_videos, Tipo_da_midia, Local_da_midia, UTC_da_postagem,Link, Url)),columns=['Data_de_extracao','Id','Engajamento','Alcance','Comentarios','Impressoes','Likes','Salvos','Visualizacoes_dos_videos','Tipo_da_midia','Local_da_midia','UTC_da_postagem', 'Link', 'URL'])
+    dfmidias = pd.DataFrame(list(zip(Data_de_extracao, Id, Engajamento, Alcance, Comentarios, Impressoes, Likes, Salvos, Visualizacoes_dos_videos, Tipo_da_midia, Local_da_midia, UTC_da_postagem,Link, Url, Thumbnail)),columns=['Data_de_extracao','Id','Engajamento','Alcance','Comentarios','Impressoes','Likes','Salvos','Visualizacoes_dos_videos','Tipo_da_midia','Local_da_midia','UTC_da_postagem', 'Link', 'URL','Thumbnail'])
    
     print(dfmidias)
 
@@ -134,8 +139,9 @@ def informacoesmidias(event, context):
                         Tipo_da_midia varchar(25),
                         Local_da_midia varchar(25),
                         UTC_da_postagem datetime,
-                        Link varchar(350),
-                        URL varchar(350));;""") 
+                        Link varchar(5000),
+                        URL varchar(5000),
+                        Thumbnail varchar(5000));;""") 
 
 
     dfmidias.to_sql(

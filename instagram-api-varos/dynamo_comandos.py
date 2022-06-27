@@ -30,6 +30,7 @@ class ComandosDynamo:
                                                         'Legenda': str(iniciar.all_insights['Legenda'][i]),
                                                         'Local_da_midia': str(iniciar.all_insights['Local_da_midia'][i]),
                                                         'URL': str(iniciar.all_insights['URL'][i]),
+                                                        'Thumbnail': str(iniciar.all_insights['Thumbnail'][i]),
                                                                 },
                                                         }
                                         
@@ -63,7 +64,8 @@ class ComandosDynamo:
                                                         'Legenda': str(iniciar.all_stories_informations['Legenda'][i]),
                                                         'Local_da_midia': str(iniciar.all_stories_informations['Local_da_midia'][i]),
                                                         'Media_url': str(iniciar.all_stories_informations['Media_url'][i]),
-                                                        'Thumbnail': str(iniciar.all_stories_informations['Thumbnail'][i]),                                                     
+                                                        'Thumbnail': str(iniciar.all_stories_informations['Thumbnail'][i]),
+                                                        'AWS_URL': str(iniciar.all_stories_informations['AWS_URL'][i]),                                                     
                                                                 },
                                                         }
                                         
